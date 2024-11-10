@@ -1,3 +1,4 @@
+from django.contrib.auth.decorators import permission_required, user_passes_test
 from django.shortcuts import render, redirect, get_object_or_404
 from .models import Book
 from django.views.generic.detail import DetailView
@@ -6,7 +7,6 @@ from django.contrib.auth import views as auth_views
 from django.contrib.auth.forms import UserCreationForm
 from django.urls import reverse_lazy
 from django.contrib.auth import login, logout
-from django.contrib.auth.decorators import user_passes_test, permission_required
 from .forms import BookForm
 
 
@@ -61,7 +61,7 @@ def member_view(request):
     return render(request, "relationship_app/member_view.html")
 
 # View to add a new book (requires 'can_add_book' permission)
-@permission_required('app_name.can_add_book')
+@permission_required('relationship_app.can_add_book')
 def add_book(request):
     if request.method == 'POST':
         form = BookForm(request.POST)
@@ -73,7 +73,7 @@ def add_book(request):
     return render(request, 'relationship_app/add_book.html', {'form': form})
 
 # View to edit a book (requires 'can_change_book' permission)
-@permission_required('app_name.can_change_book')
+@permission_required('relationship_app.can_change_book')
 def edit_book(request, book_id):
     book = get_object_or_404(Book, id=book_id)
     if request.method == 'POST':
@@ -86,7 +86,7 @@ def edit_book(request, book_id):
     return render(request, 'relationship_app/edit_book.html', {'form': form})
 
 # View to delete a book (requires 'can_delete_book' permission)
-@permission_required('app_name.can_delete_book')
+@permission_required('relationship_app.can_delete_book')
 def delete_book(request, book_id):
     book = get_object_or_404(Book, id=book_id)
     if request.method == 'POST':
