@@ -5,6 +5,7 @@ from .models import Library
 from django.contrib.auth import views as auth_views
 from django.contrib.auth.forms import UserCreationForm
 from django.urls import reverse_lazy
+from django.contrib.auth import login, logout
 
 
 # Function-based view to list all books and their authors
