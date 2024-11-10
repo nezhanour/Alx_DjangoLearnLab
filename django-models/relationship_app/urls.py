@@ -1,6 +1,7 @@
 from django.urls import path
 from .views import list_books, LibraryDetailView
 from django.contrib.auth import views as auth_views
+from . import views
 
 
 urlpatterns = [
@@ -10,6 +11,6 @@ urlpatterns = [
     # URL patterns that route to the Class-based view to show a library's details
     path('library/<int:pk>/', LibraryDetailView.as_view(), name='library_detail'),
 
-    path('login/', auth_views.LoginView.as_view(template_name='login.html'), name='login'),
-    path('logout/', auth_views.LogoutView.as_view(template_name='logout.html'), name='logout'),
+    path('login/', views.register(template_name='login.html'), name='login'),
+    path('logout/', views.register(template_name='logout.html'), name='logout'),
 ]
