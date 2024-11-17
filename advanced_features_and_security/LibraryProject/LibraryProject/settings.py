@@ -26,8 +26,11 @@ SECRET_KEY = 'django-insecure-n+-_18*-0fdu&7(f@#yl6j%v!=)cko_!b1s^f=x$#e-qa+jqd@
 DEBUG = False
 
 # Browser security settings
+# Enable the browser's XSS protection feature
 SECURE_BROWSER_XSS_FILTER = True  # Helps prevent XSS
+# Prevent Clickjacking by disallowing your site to be framed
 X_FRAME_OPTIONS = 'DENY'  # Prevents clickjacking attacks
+# Prevent browsers from MIME-sniffing a response and interpreting it as a different content type
 SECURE_CONTENT_TYPE_NOSNIFF = True  # Prevents MIME-type sniffing
 
 # Enforce HTTPS for cookies
@@ -37,6 +40,9 @@ SESSION_COOKIE_SECURE = True # Session cookie sent only via HTTPS
 # Redirect all HTTP requests to HTTPS
 SECURE_SSL_REDIRECT = True
 SECURE_HSTS_SECONDS = 31536000  # 1 year in seconds
+SECURE_HSTS_INCLUDE_SUBDOMAINS = True  # Apply HSTS to all subdomains
+SECURE_HSTS_PRELOAD = True  # Allow site to be preloaded into browsers' HSTS lists
+
 
 
 # HTTP Strict Transport Security (HSTS) settings
