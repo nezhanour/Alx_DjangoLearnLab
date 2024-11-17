@@ -34,6 +34,13 @@ SECURE_CONTENT_TYPE_NOSNIFF = True  # Prevents MIME-type sniffing
 CSRF_COOKIE_SECURE = True # CSRF cookie sent only via HTTPS
 SESSION_COOKIE_SECURE = True # Session cookie sent only via HTTPS
 
+# Redirect all HTTP requests to HTTPS
+SECURE_SSL_REDIRECT = True
+SECURE_HSTS_SECONDS = 31536000  # 1 year in seconds
+
+
+# HTTP Strict Transport Security (HSTS) settings
+
 ALLOWED_HOSTS = []
 
 LOGIN_REDIRECT_URL = 'home' 
@@ -60,8 +67,15 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    # other middleware
+    'csp.middleware.CSPMiddleware',
 ]
 
+# Define your CSP policy
+CSP_DEFAULT_SRC = ("'self'",)
+CSP_SCRIPT_SRC = ("'self'", "'unsafe-inline'")
+CSP_STYLE_SRC = ("'self'", "https://fonts.googleapis.com")
+CSP_IMG_SRC = ("'self'", "data:")
 ROOT_URLCONF = 'LibraryProject.urls'
 
 TEMPLATES = [
