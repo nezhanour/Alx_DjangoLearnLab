@@ -4,6 +4,6 @@ from .models import Book
 
 @permission_required('bookshelf.can_edit', raise_exception=True, )
 def edit_book(request, title):
-    book = get_object_or_404(Book, title=title)
+    book_list = get_object_or_404(Book, title=title)
     # Perform the edit logic here
-    return render(request, 'bookshelf/edit_book.html', {'books': book})
+    return render(request, 'bookshelf/edit_book.html', {'books': book_list})
