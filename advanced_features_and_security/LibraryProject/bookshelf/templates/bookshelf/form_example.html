@@ -3,12 +3,13 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Form</title>
+    <title>Form Example</title>
   </head>
   <body>
-    <form method="post" action="{% url 'your_view_url' %}">
-      {% csrf_token %}
-      <input type="text" name="name" placeholder="Enter your name" />
+    <h1>Submit a Form</h1>
+    <form method="post">
+      {% csrf_token %} {{ form.as_p }}
+      <!-- This will render the form fields as paragraph elements -->
       <button type="submit">Submit</button>
     </form>
   </body>
