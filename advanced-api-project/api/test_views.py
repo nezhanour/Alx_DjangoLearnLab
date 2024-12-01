@@ -1,4 +1,5 @@
 from rest_framework.test import APITestCase
+from django.contrib.auth.models import User
 from rest_framework import status
 from django.urls import reverse
 from .models import Book, Author
@@ -9,6 +10,8 @@ class BookAPITestCase(APITestCase):
     
     def setUp(self):
         """Set up initial data for the tests."""
+        # Create a user for authentication
+        self.user = User.objects.create_user(username='testuser', password='testpass')
         self.author = Author.objects.create(name="Author A")
         self.book1 = Book.objects.create(title="Book 1", publication_year="2020-01-01", author=self.author)
         self.book2 = Book.objects.create(title="Book 2", publication_year="2021-01-01", author=self.author)
@@ -82,13 +85,31 @@ class BookAPITestCase(APITestCase):
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(response.data[0]['publication_year'], "2019-01-01")  # Oldest book first
 
-    # Test unauthenticated access to create
-    def test_unauthenticated_create_book(self):
-        client = APIClient()
+    # Test authenticated access to create
+    def test_authenticated_create_book(self):
+        # Log in as the user
+        self.client.login(username='testuser', password='testpass')
+
+        # Now, create a book as an authenticated user
         data = {
-            "title": "Unauthorized Book",
+            "title": "New Authenticated Book",
             "publication_year": "2022-01-01",
             "author_name": "New Author"
         }
-        response = client.post(self.create_url, data, format='json')
+        response = self.client.post(self.book_url, data, format='json')
+
+        # Check if the book is created successfully (status code 201)
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+
+    # Test unauthenticated access to create
+    def test_unauthenticated_create_book(self):
+        # Try to create a book without logging in
+        data = {
+            "title": "Unauthenticated Book",
+            "publication_year": "2022-01-01",
+            "author_name": "New Author"
+        }
+        response = self.client.post(self.book_url, data, format='json')
+
+        # Check if the request is forbidden (status code 403)
         self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
