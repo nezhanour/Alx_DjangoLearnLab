@@ -4,8 +4,14 @@ from django.db import models
 class Author(models.Model):
     name = models.CharField(max_length=200)
 
+    def __str__(self):
+        return self.name
+
 #Creation of Book model with  a one-to-many relationship from Author to Books
 class Book(models.Model):
     title = models.CharField(max_length=200)
     publication_year = models.DateField()
     author = models.ForeignKey(Author, on_delete=models.CASCADE, related_name='books')
+
+    def __str__(self):
+        return self.title

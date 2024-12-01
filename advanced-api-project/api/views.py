@@ -12,7 +12,7 @@ class DetailView(RetrieveAPIView):
     serializer_class = BookSerializer
 
 class CreateView(CreateAPIView):
-    queryset = Book.objects.all()
+    queryset = Book.objects.all() # All books in the database
     serializer_class = BookSerializer
 
 class UpdateView(UpdateAPIView):
