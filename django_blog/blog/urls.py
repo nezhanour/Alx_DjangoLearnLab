@@ -4,7 +4,7 @@ from . import views
 
 
 urlpatterns = [
-    path('', views.base, name='home'),
+    path('', views.posts_list, name='home'),
     path('all_posts/', views.posts_list, name='posts_list'),
     path('posts/', views.PostListView.as_view(), name='post-list'),
     path('login/', auth_views.LoginView.as_view(template_name='blog/login.html'), name='login'),
@@ -19,4 +19,6 @@ urlpatterns = [
     path('post/<int:pk>/comments/new/', views.CommentCreateView.as_view(), name='comment-create'),
     path('comment/<int:pk>/update/', views.CommentUpdateView.as_view(), name='comment-edit'),
     path('comment/<int:pk>/delete/', views.CommentDeleteView.as_view(), name='comment-delete'),
+    path('search/', views.post_search, name='post-search'),
+    path('tags/<slug:tag_slug>/', views.PostListView.as_view(), name='post-by-tag'),
 ]

@@ -36,4 +36,15 @@
 </form>
 {% else %}
 <p>You must be logged in to add a comment.</p>
-{% endif %} {% endblock %}
+{% endif %}
+
+<hr />
+
+<p>
+  Tags: {% for tag in post.tags.all %}
+  <a href="{% url 'post-by-tag' tag.slug %}">{{ tag.name }}</a>
+  {% if notforloop.last %},
+  <!---->
+  {% endif %} {% endfor %}
+</p>
+{% endblock %}
