@@ -1,8 +1,8 @@
-from django.shortcuts import render, redirect
-from .models import Post
+from django.shortcuts import render, redirect, get_object_or_404
+from .models import Post, Comment
 from django.contrib.auth import login
 from django.contrib.auth.decorators import login_required
-from .forms import CustomUserCreationForm
+from .forms import CustomUserCreationForm, CommentForm
 from django.contrib.auth.forms import UserChangeForm
 from django.views.generic import ListView, DetailView, CreateView, UpdateView, DeleteView
 from .serializers import PostSerializer
@@ -43,19 +43,26 @@ def edit_profile(request):
     return render(request, 'blog/edit_profile.html', {'form' : form})
 
 # Use ListView to display a list of all blog posts
-class ListView(ListView):
+class PostListView(ListView):
     model = Post
     template_name = 'blog/post_list.html'
     context_object_name = 'posts'
     
 
 # use DetailView To display a single post,
-class DetailView(DetailView):
+class PostDetailView(DetailView):
     model = Post
     template_name = 'blog/post_detail.html'
+    context_object_name = 'post'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['comments'] = Comment.objects.filter(post=self.object).order_by('-created_at')
+        context['comment_form'] = CommentForm()
+        return context
 
 # use CreateView to create new post. Allow authenticated users to create new posts
-class CreateView(LoginRequiredMixin, CreateView):
+class PostCreateView(LoginRequiredMixin, CreateView):
     model = Post
     fields = ['title', 'content']
     template_name = 'blog/post_form.html'
@@ -65,7 +72,7 @@ class CreateView(LoginRequiredMixin, CreateView):
         return super().form_valid(form)
 
 # UpdateView for Editing Posts and Allow only the author to update their own posts using UserPassesTestMixin
-class UpdateView(LoginRequiredMixin,UserPassesTestMixin , UpdateView):
+class PostUpdateView(LoginRequiredMixin,UserPassesTestMixin , UpdateView):
     model = Post
     fields = ['title', 'content']
     template_name = 'blog/post_form.html'
@@ -79,7 +86,7 @@ class UpdateView(LoginRequiredMixin,UserPassesTestMixin , UpdateView):
         return self.request.user == post.author
 
 # DeleteView for Deleting Posts and use UserPassesTestMixin to ensure only the author can delete their post
-class DeleteView(LoginRequiredMixin, UserPassesTestMixin, DeleteView):
+class PostDeleteView(LoginRequiredMixin, UserPassesTestMixin, DeleteView):
     model = Post
     success_url = reverse_lazy('post-list')
     template_name = 'blog/post_confirm_delete.html'
@@ -87,3 +94,42 @@ class DeleteView(LoginRequiredMixin, UserPassesTestMixin, DeleteView):
     def test_func(self):
         post = self.get_object()
         return self.request.user == post.author
+
+#a view to handle comment submission:
+class CommentCreateView(LoginRequiredMixin, CreateView):
+    model = Comment
+    form_class = CommentForm
+
+    def form_valid(self, form):
+        post = get_object_or_404(Post, pk=self.kwargs['post_id'])
+        form.instance.post = post
+        form.instance.author = self.request.user
+        return super().form_valid(form)
+
+    def get_success_url(self):
+        return self.object.post.get_absolute_url()
+    
+# view for updating comments
+class CommentUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
+    model = Comment
+    form_class = CommentForm
+    template_name = 'blog/comment_form.html'
+
+    def test_func(self):
+        comment = self.get_object()
+        return self.request.user == comment.author
+
+    def get_success_url(self):
+        return self.object.post.get_absolute_url()
+
+# view for deleting comments:
+class CommentDeleteView(LoginRequiredMixin, UserPassesTestMixin, DeleteView):
+    model = Comment
+    template_name = 'blog/comment_confirm_delete.html'
+
+    def test_func(self):
+        comment = self.get_object()
+        return self.request.user == comment.author
+
+    def get_success_url(self):
+        return self.object.post.get_absolute_url()
