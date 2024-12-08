@@ -49,14 +49,6 @@ class PostListView(ListView):
     template_name = 'blog/post_list.html'
     context_object_name = 'posts'
     
-    def get_queryset(self):
-        queryset = super().get_queryset()
-        tag_slug = self.kwargs.get('tag_slug')
-        if tag_slug:
-            tag = get_object_or_404(Tag, slug=tag_slug)
-            queryset = queryset.filter(tags__in=[tag])
-        return queryset
-
 # use DetailView To display a single post,
 class PostDetailView(DetailView):
     model = Post
@@ -153,3 +145,21 @@ def post_search(request):
     else:
         posts = Post.objects.none()
     return render(request, 'blog/search_results.html', {'posts': posts, 'query': query})
+
+class PostByTagListView(ListView):
+    model = Post
+    template_name = 'blog/post_list_by_tag.html'
+    context_object_name = 'posts'
+    paginate_by = 10  # Optional: if you want pagination
+
+    def get_queryset(self):
+        # Get the tag based on the slug passed in the URL
+        self.tag = get_object_or_404(Tag, slug=self.kwargs['slug'])
+        # Filter posts that have this tag
+        return Post.objects.filter(tags=self.tag).order_by('-published_date')
+
+    def get_context_data(self, **kwargs):
+        # Add the tag to the context so you can display it in the template
+        context = super().get_context_data(**kwargs)
+        context['tag'] = self.tag
+        return context
