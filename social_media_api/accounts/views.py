@@ -17,7 +17,8 @@ class RegisterUser(APIView):
         if serializer.is_valid():
             user = serializer.save()
             token, created = Token.objects.get_or_create(user=user)
-            return Response(serializer.errors, status=400)
+            return Response({'Created successfully'}, status=201)
+        return Response(serializer.errors, status=400)
         
 class loginUser(ObtainAuthToken):
     permission_classes = [AllowAny]
