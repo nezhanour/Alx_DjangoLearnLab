@@ -5,8 +5,9 @@ from rest_framework.permissions import AllowAny
 from .serializers import UserRegistrationSerializer, UserLoginSerializer
 from rest_framework.authtoken.models import Token
 from rest_framework.response import Response
-# from rest_framework.authtoken.views import ObtainAuthToken
 from rest_framework import status, generics
+from rest_framework.permissions import IsAuthenticated
+from .models import CustomUser
 
 CustomUser = get_user_model()
 
@@ -33,3 +34,11 @@ class loginUserView(APIView):
             'username': user['username'],
             'token': user['token'],
         }, status=status.HTTP_200_OK)
+    
+class UserProfileView(generics.RetrieveUpdateAPIView):
+    queryset = CustomUser.objects.all()
+    serializer_class = UserRegistrationSerializer
+    permission_classes = [IsAuthenticated]
+
+    def get_object(self):
+        return self.request.user
