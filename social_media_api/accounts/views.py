@@ -7,6 +7,7 @@ from rest_framework.authtoken.models import Token
 from rest_framework.response import Response
 from rest_framework import status, generics
 from rest_framework.permissions import IsAuthenticated
+from rest_framework import permissions
 from .models import CustomUser
 from django.shortcuts import get_object_or_404
 
@@ -39,13 +40,13 @@ class loginUserView(APIView):
 class UserProfileView(generics.RetrieveUpdateAPIView):
     queryset = CustomUser.objects.all()
     serializer_class = UserRegistrationSerializer
-    permission_classes = [IsAuthenticated]
+    permission_classes = [permissions.IsAuthenticated]
 
     def get_object(self):
         return self.request.user
 
 class FollowUser(generics.GenericAPIView):
-    permission_classes = [IsAuthenticated]
+    permission_classes = [permissions.IsAuthenticated]
     queryset = CustomUser.objects.all()
 
     def post(self, request, user_id, *args, **kwargs):
@@ -56,7 +57,7 @@ class FollowUser(generics.GenericAPIView):
         return Response({"detail": "Followed user successfully."}, status=status.HTTP_200_OK)
 
 class UnfollowUser(generics.GenericAPIView):
-    permission_classes = [IsAuthenticated]
+    permission_classes = [permissions.IsAuthenticated]
     queryset = CustomUser.objects.all()
 
     def post(self, request, user_id, *args, **kwargs):
