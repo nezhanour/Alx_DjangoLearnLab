@@ -43,22 +43,24 @@ class UserProfileView(generics.RetrieveUpdateAPIView):
 
     def get_object(self):
         return self.request.user
-    
-class FollowUser(APIView):
-    permission_classes = [IsAuthenticated]
 
-    def post(self, request, user_id):
-        user_to_follow = get_object_or_404(get_user_model(), id=user_id)
+class FollowUser(generics.GenericAPIView):
+    permission_classes = [IsAuthenticated]
+    queryset = CustomUser.objects.all()
+
+    def post(self, request, user_id, *args, **kwargs):
+        user_to_follow = get_object_or_404(CustomUser, id=user_id)
         if user_to_follow == request.user:
             return Response({"detail": "You cannot follow yourself."}, status=status.HTTP_400_BAD_REQUEST)
         request.user.following.add(user_to_follow)
         return Response({"detail": "Followed user successfully."}, status=status.HTTP_200_OK)
 
-class UnfollowUser(APIView):
+class UnfollowUser(generics.GenericAPIView):
     permission_classes = [IsAuthenticated]
+    queryset = CustomUser.objects.all()
 
-    def post(self, request, user_id):
-        user_to_unfollow = get_object_or_404(get_user_model(), id=user_id)
+    def post(self, request, user_id, *args, **kwargs):
+        user_to_unfollow = get_object_or_404(CustomUser, id=user_id)
         if user_to_unfollow == request.user:
             return Response({"detail": "You cannot unfollow yourself."}, status=status.HTTP_400_BAD_REQUEST)
         request.user.following.remove(user_to_unfollow)
