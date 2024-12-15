@@ -41,6 +41,7 @@ INSTALLED_APPS = [
     'rest_framework.authtoken',
     'posts',
     'django_filters',
+    'notifications',
 ]
 
 # to use the custom user model
